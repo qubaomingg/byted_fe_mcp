@@ -1,0 +1,29 @@
+{
+  "name": "byted_fe_mcp",
+  "version": "1.0.0",
+  "description": "A Model Context Protocol server",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "byted_fe_mcp": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x build/index.js",
+    "prepare": "npm run build",
+    "start": "node --experimental-fetch build/index.js",
+    "serve": "NODE_ENV=production node --enable-source-maps --experimental-fetch build/index.js",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "0.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.18.0",
+    "typescript": "^5.3.3",
+    "@modelcontextprotocol/inspector": "^0.6.0"
+  }
+}
