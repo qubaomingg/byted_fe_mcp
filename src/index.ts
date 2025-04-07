@@ -73,52 +73,62 @@ type MetaData = {
 /**
  * 组件库文档数据存储
  */
+// 组件库文档数据存储
 let LibraryDocs: { [id: string]: LibraryDoc } = {};
+let isLibraryDocsLoading = false;
+let loadLibraryDocPromise: Promise<void> | null = null;
 
 /**
  * 从接口加载组件库文档数据
  */
 async function loadLibraryDoc() {
-  try {
-    // 1. 先获取所有组件库列表
-    const response = await fetch(`${API_BASE_URL}/api/status`);
-    const result = await response.json();
-    const docs: { [id: string]: LibraryDoc } = {};
-    // 2. 遍历每个组件库，获取其组件列表
-    for (const collection of result.data.collections || []) {
-      const componentsResponse = await fetch(
-        `${API_BASE_URL}/api/components?repo=${collection.name}`
-      );
-      const componentsData = await componentsResponse.json();
-      // 3. 构建组件库文档对象
-      docs[collection.name] = {
-        id: collection.name,
-        components: (componentsData?.data?.data || []).map(
-          (item: {id: string; metadata: MetaData}) => {
-            return {
-              name: item.id,
-              demo: item.metadata?.demo,
-            }
-          },
-        ),
-        introduce: `${collection?.metadata?.brief}`,
-      };
-    }
-
-    LibraryDocs = docs;
-  } catch (error) {
-    console.error('Failed to load library docs:', error);
-    LibraryDocs = {};
+  if (isLibraryDocsLoading) {
+    return loadLibraryDocPromise;
   }
+
+  isLibraryDocsLoading = true;
+  loadLibraryDocPromise = (async () => {
+    try {
+      // 1. 先获取所有组件库列表
+      const response = await fetch(`${API_BASE_URL}/api/status`);
+      const result = await response.json();
+      const docs: { [id: string]: LibraryDoc } = {};
+      // 2. 遍历每个组件库，获取其组件列表
+      for (const collection of result.data.collections || []) {
+        const componentsResponse = await fetch(
+          `${API_BASE_URL}/api/components?repo=${collection.name}`
+        );
+        const componentsData = await componentsResponse.json();
+        // 3. 构建组件库文档对象
+        docs[collection.name] = {
+          id: collection.name,
+          components: (componentsData?.data?.data || []).map(
+            (item: {id: string; metadata: MetaData}) => {
+              return {
+                name: item.id,
+                demo: item.metadata?.demo,
+              }
+            }
+          ),
+          introduce: `${collection?.metadata?.brief}`,
+        };
+      }
+
+      LibraryDocs = docs;
+    } catch (error) {
+      console.error('Failed to load library docs:', error);
+      LibraryDocs = {};
+    }
+  })();
+
+  return loadLibraryDocPromise;
 }
 
 /**
  * Start the server using stdio transport.
  */
 async function main() {
-  // 启动前先加载组件数据
-  await loadLibraryDoc();
-
+  // 移除 await loadLibraryDoc();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
@@ -127,6 +137,7 @@ async function main() {
  * 修改 ListResourcesRequestSchema 处理器
  */
 server.setRequestHandler(ListResourcesRequestSchema, async () => {
+  await loadLibraryDoc();
   return {
     resources: Object.entries(LibraryDocs).map(([id, doc]) => ({
       uri: `component://${doc.id}`,
@@ -141,6 +152,7 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
  * 修改 ReadResourceRequestSchema 处理器
  */
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+  await loadLibraryDoc();
   const url = new URL(request.params.uri);
   const library = url.hostname;
   const doc = LibraryDocs[library];
