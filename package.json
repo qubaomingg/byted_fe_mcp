@@ -15,7 +15,7 @@
     "url": "git@github.com:qubaomingg/byted_fe_mcp.git"
   },
   "scripts": {
-    "build": "tsc && chmod +x dist/*.js",
+    "build": "npx tsc && chmod +x dist/*.js",
     "start": "node --experimental-fetch dist/index.js",
     "dev": "ts-node --esm src/index.ts",
     "dev:inspector": "npx @modelcontextprotocol/inspector dist/index.js",
