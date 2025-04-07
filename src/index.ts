@@ -51,18 +51,20 @@ const server = new Server(
  * API 基础地址
  */
 const API_BASE_URL = 'http://fe-lib.bytedance.net';
+// const API_BASE_URL = 'http://localhost:9000';
 
 /**
  * 组件库文档类型定义
  */
 type LibraryDoc = {
   id: string; // 组件库名称 (okee/dprc)
-  components: string[]; // 组件列表(button/table)
+  components: MetaData[]; // 组件列表(button/table)
   introduce: string; // 组件库简单介绍
 };
 type MetaData = {
-  file: string;
+  name: string;
   repo: string;
+  demo: string;
 }
 
 /**
@@ -89,7 +91,12 @@ async function loadLibraryDoc() {
       docs[collection.name] = {
         id: collection.name,
         components: (componentsData?.data?.data || []).map(
-          (item: { id: string }) => item.id,
+          (item: {id: string; metadata: MetaData}) => {
+            return {
+              name: item.id,
+              demo: item.metadata?.demo,
+            }
+          },
         ),
         introduce: `${collection?.metadata?.brief}`,
       };
@@ -138,10 +145,11 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   if (!doc) {
     throw new Error(`Library ${library} not found`);
   }
+  console.error(doc.components.map(component => component.name));
 
   const content = `
     组件库: ${doc.id}
-    组件列表: ${doc.components.join(', ')}
+    组件列表: ${doc.components.map(component => component.name).join(', ')}
     简介: ${doc.introduce}
   `.trim();
 
@@ -322,9 +330,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           }]
         };
       }
-
+      console.error(doc);
+      console.error('------------')
       const components = doc.components.map(component => ({
-        name: component,
+        name: component.name,
+        demo: component.demo,
         library: doc.id,
       }));
 
@@ -387,7 +397,7 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     role: "user" as const,
     content: {
       type: "text",
-      text: `${component}`
+      text: `${component.name}`
     }
   }));
 
