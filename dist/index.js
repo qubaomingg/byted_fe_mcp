@@ -10,6 +10,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListResourcesRequestSchema, ListToolsRequestSchema, ReadResourceRequestSchema, ListPromptsRequestSchema, GetPromptRequestSchema, } from '@modelcontextprotocol/sdk/types.js';
+import 'dotenv/config';
 /**
  * Create an MCP server with capabilities for resources (to list/read notes),
  * tools (to create new notes), and prompts (to summarize notes).
@@ -34,7 +35,10 @@ const server = new Server({
 /**
  * API 基础地址
  */
-const API_BASE_URL = 'http://fe-lib.bytedance.net';
+if (!process.env.API_BASE_URL) {
+    throw new Error('API_BASE_URL environment variable is not defined');
+}
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9000';
 /**
  * 组件库文档数据存储
  */

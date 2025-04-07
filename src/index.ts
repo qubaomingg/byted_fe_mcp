@@ -19,7 +19,7 @@ import {
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-
+import 'dotenv/config';
 
 
 /**
@@ -50,7 +50,10 @@ const server = new Server(
 /**
  * API 基础地址
  */
-const API_BASE_URL = 'http://fe-lib.bytedance.net';
+if (!process.env.API_BASE_URL) {
+  throw new Error('API_BASE_URL environment variable is not defined');
+}
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9000';
 // const API_BASE_URL = 'http://localhost:9000';
 
 /**
