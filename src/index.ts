@@ -182,6 +182,7 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
  * 修改 ListToolsRequestSchema 处理器
  */
 server.setRequestHandler(ListToolsRequestSchema, async () => {
+  await loadLibraryDoc();
   return {
     tools: [
       {
@@ -242,6 +243,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  await loadLibraryDoc();
   switch (request.params.name) {
     case "search_component": {
       const query = String(request.params.arguments?.query);
@@ -345,8 +347,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           }]
         };
       }
-      console.error(doc);
-      console.error('------------')
       const components = doc.components.map(component => ({
         name: component.name,
         demo: component.demo,
@@ -368,6 +368,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // 更新处理器的类型
 server.setRequestHandler(ListPromptsRequestSchema, async () => {
+  await loadLibraryDoc();
   // 获取所有组件库名称
   const libraries = Object.keys(LibraryDocs);
 
@@ -399,6 +400,7 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
 });
 
 server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+  await loadLibraryDoc();
   const prompt = (request?.params?.name as string).toLowerCase();
   const library = prompt.includes('okee') ? 'okee' : 'dprc';
   const doc = LibraryDocs[library];
