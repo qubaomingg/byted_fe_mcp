@@ -51,7 +51,8 @@ const server = new Server(
  * API 基础地址
  */
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://fe-lib.bytedance.net';
+const API_PREFIX = 'bp-mcp';
+const API_BASE_URL = process.env.API_BASE_URL || 'https://www.life-data.cn';
 // const API_BASE_URL = 'http://localhost:9000';
 if (!API_BASE_URL) {
   throw new Error('API_BASE_URL environment variable is not defined');
@@ -91,13 +92,13 @@ async function loadLibraryDoc() {
   loadLibraryDocPromise = (async () => {
     try {
       // 1. 先获取所有组件库列表
-      const response = await fetch(`${API_BASE_URL}/api/status`);
+      const response = await fetch(`${API_BASE_URL}/${API_PREFIX}/status`);
       const result = await response.json();
       const docs: { [id: string]: LibraryDoc } = {};
       // 2. 遍历每个组件库，获取其组件列表
       for (const collection of result.data.collections || []) {
         const componentsResponse = await fetch(
-          `${API_BASE_URL}/api/components?repo=${collection.name}`
+          `${API_BASE_URL}/${API_PREFIX}/components?repo=${collection.name}`
         );
         const componentsData = await componentsResponse.json();
         // 3. 构建组件库文档对象
@@ -161,7 +162,6 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   if (!doc) {
     throw new Error(`Library ${library} not found`);
   }
-  console.error(doc.components.map(component => component.name));
 
   const content = `
     组件库: ${doc.id}
@@ -252,7 +252,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       try {
-        let url = `${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`;
+        let url = `${API_BASE_URL}/${API_PREFIX}/search?q=${encodeURIComponent(query)}`;
         if (repo) {
           url += `&repo=${encodeURIComponent(repo)}`;
         }
@@ -293,7 +293,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       try {
         // 构建多个 q 参数的 URL
-        let url = `${API_BASE_URL}/api/search/multi?${queries
+        let url = `${API_BASE_URL}/${API_PREFIX}/search/multi?${queries
           .map((q) => `q=${encodeURIComponent(q)}`)
           .join('&')}`;
 

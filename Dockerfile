@@ -23,7 +23,7 @@ COPY --from=builder /app/package.json .
 COPY --from=builder /app/package-lock.json .
 
 ENV NODE_ENV=production
-ENV API_BASE_URL=http://fe-lib.bytedance.net
+ENV API_BASE_URL=https://www.life-data.cn
 
 # 安装生产依赖
 RUN npm ci --omit-dev
