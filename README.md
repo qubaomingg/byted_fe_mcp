@@ -1,5 +1,7 @@
 # byted_fe_mcp MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@qubaomingg/byted_fe_mcp)](https://smithery.ai/server/@qubaomingg/byted_fe_mcp)
+
 A Model Context Protocol server
 
 This is a TypeScript-based MCP server that implements a simple notes system. It demonstrates core MCP concepts by providing:
@@ -43,6 +45,16 @@ npm run watch
 ```
 
 ## Installation
+
+### Installing via Smithery
+
+To install byted fe resources for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@qubaomingg/byted_fe_mcp):
+
+```bash
+npx -y @smithery/cli install @qubaomingg/byted_fe_mcp --client claude
+```
+
+### Installing Manually
 
 To use with Claude Desktop, add the server config:
 
