@@ -35,10 +35,11 @@ const server = new Server({
 /**
  * API 基础地址
  */
-if (!process.env.API_BASE_URL) {
+const API_BASE_URL = process.env.API_BASE_URL;
+// const API_BASE_URL = 'http://localhost:9000';
+if (!API_BASE_URL) {
     throw new Error('API_BASE_URL environment variable is not defined');
 }
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9000';
 /**
  * 组件库文档数据存储
  */
