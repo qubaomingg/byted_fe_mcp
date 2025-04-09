@@ -2,11 +2,11 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# 先只拷贝package文件，利用docker缓存层
+# 先只拷贝package文件
 COPY package*.json ./
 
 # 安装所有依赖（包括devDependencies）
-RUN --mount=type=cache,target=/root/.npm npm install
+RUN npm install
 
 # 然后拷贝其他文件
 COPY . .
