@@ -184,20 +184,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: 'test_tool',
-        description: '测试工具',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            input: {
-              type: 'string',
-              description: '测试输入'
-            }
-          },
-          required: ['input']
-        }
-      },
-      {
         name: 'search_component',
         description: '查找组件库使用',
         inputSchema: {
@@ -256,15 +242,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
-    case "test_tool": {
-      const input = String(request.params.arguments?.input);
-      return {
-        content: [{
-          type: 'text',
-          text: `测试工具收到输入: ${input}`
-        }]
-      };
-    }
     case "search_component": {
       const query = String(request.params.arguments?.query);
       const repo = request.params.arguments?.repo as string;
