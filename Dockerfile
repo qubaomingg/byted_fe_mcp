@@ -1,21 +1,19 @@
-# 使用官方 Node.js 镜像作为基础镜像
 FROM node:18-alpine
 
-# 创建工作目录
 WORKDIR /app
 
-# 复制 package.json 和 package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# 安装依赖
+# Install dependencies
 RUN npm install
 
-# 复制项目文件
+# Copy application code
 COPY . .
 
-# 设置环境变量（可被 docker run 时覆盖）
-ENV API_BASE_URL=http://fe-lib.bytedance.net
-ENV NODE_ENV=production
+# Build the application
+RUN npm run build
 
-# 启动命令
-CMD ["node", "dist/index.js"]
+# Command will be provided by smithery.yaml
+# 更新启动命令，添加--experimental-fetch参数
+ENTRYPOINT ["node", "--experimental-fetch", "dist/index.js"]
