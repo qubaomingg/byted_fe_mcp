@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # 构建应用
-RUN npm run build
+RUN npm run build --no-cache
 
 FROM node:18-alpine AS release
 WORKDIR /app
