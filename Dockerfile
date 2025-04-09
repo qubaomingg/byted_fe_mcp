@@ -1,19 +1,32 @@
-FROM node:18-alpine
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# 先只拷贝package文件，利用docker缓存层
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# 安装所有依赖（包括devDependencies）
+RUN --mount=type=cache,target=/root/.npm npm install
 
-# Copy application code
+# 然后拷贝其他文件
 COPY . .
 
-# Build the application
+# 构建应用
 RUN npm run build
 
-# Command will be provided by smithery.yaml
-# 更新启动命令，添加--experimental-fetch参数
-ENTRYPOINT ["node", "--experimental-fetch", "dist/index.js"]
+FROM node:18-alpine AS release
+WORKDIR /app
+
+# 只拷贝必要的生产文件
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json .
+COPY --from=builder /app/package-lock.json .
+
+ENV NODE_ENV=production
+ENV API_BASE_URL=http://fe-lib.bytedance.net
+
+# 安装生产依赖
+RUN npm ci --omit-dev
+
+# 使用CMD而不是ENTRYPOINT以便覆盖
+CMD ["node", "dist/index.js"]
